@@ -1989,8 +1989,8 @@ class AdvancedBot(BaseBot):
             await self.highrise.chat(self.get_message("teleport_error", error=str(e)))
             logger.error(f"خطا در cmd_down: {e}")
 
-    async def cmd_changeroom(self, user: User, args: list):
-        """دستور فوق امنیتی و اختصاصی فقط برای ad0ri جهت تغییر روم و ری‌استارت ربات با ذخیره دایمی"""
+            async def cmd_changeroom(self, user: User, args: list):
+        """دستور فوق امنیتی و اختصاصی فقط برای ad0ri جهت تغییر روم آنی بدون کرش"""
         import os
         import sys
         import asyncio
@@ -2007,30 +2007,26 @@ class AdvancedBot(BaseBot):
 
         new_room_id = args[0].strip()
         
-        await self.highrise.chat(f"🚀 دستور انتقال به روم جدید توسط ad0ri تایید شد. در حال ذخیره‌سازی و ری‌استارت...")
+        await self.highrise.chat(f"🚀 دستور انتقال به روم جدید توسط ad0ri تایید شد. در حال جابه‌جایی ربات...")
         logger.info(f"مالک ربات (ad0ri) دستور انتقال به روم {new_room_id} را صادر کرد.")
         
-        # 📝 ذخیره آیدی روم جدید در یک فایل متنی تا با ری‌استارت شدن پاک نشود
-        try:
-            with open("current_room.txt", "w") as f:
-                f.write(new_room_id)
-        except Exception as e:
-            logger.error(f"خطا در ذخیره فایل روم: {e}")
-        
-        # قرار دادن در متغیر محیطی فعلی
-        os.environ["ROOM_ID"] = new_room_id
-        
-        # بستن رسمی کانکشن هایرایز برای جلوگیری از باگ روح
+        # ۱. بستن کانکشن فعلی برای جلوگیری از باگ روح
         try:
             if hasattr(self, 'highrise') and self.highrise:
                 await self.highrise.close()
         except Exception:
             pass
             
-        await asyncio.sleep(3)
+        await asyncio.sleep(4) # ۴ ثانیه صبر برای آزاد شدن توکن در سرور بازی
         
-        # ری‌استارت زنده و آنی پایتون
-        os.execv(sys.executable, ['python'] + sys.argv)
+        # ۲. اجرای مستقیم ربات روی روم جدید بدون نیاز به ری‌استارت فایل!
+        try:
+            api_token = os.getenv("API_TOKEN")
+            # تغییر دادن آیدی روم در تنظیمات اصلی رانرِ ربات
+            logger.info(f"🔄 در حال اتصال به روم جدید: {new_room_id}")
+            asyncio.create_task(self.run(new_room_id, api_token))
+        except Exception as e:
+            logger.error(f"خطا در جابه‌جایی مستقیم روم: {e}")
     
     async def cmd_ban(self, user: User, message: str):
         if user.username.lower() not in self.config["admin_usernames"]:
