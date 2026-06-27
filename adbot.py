@@ -2460,10 +2460,9 @@ class AdvancedBot(BaseBot):
             logger.error(f"خطا در cmd_partys برای {target_username}: {str(e)}")
 
     async def cmd_find_emote(self, user: User, parts: list):
-        """دستور جستجوی آیدی سروری دنس"""
+        """دستور جستجوی آیدی سروری دنس بدون نیاز به متد قدیمی get_emotes"""
         admins_lower = [admin.lower() for admin in self.config.get("admin_usernames", [])]
         if user.username.lower() not in admins_lower:
-            await self.highrise.chat("❌ این دستور فقط برای ادمین‌ها!")
             return
 
         if len(parts) < 2:
@@ -2472,17 +2471,30 @@ class AdvancedBot(BaseBot):
 
         search_keyword = " ".join(parts[1:]).lower()
         
-        try:
-            emotes_list = await self.highrise.get_emotes()
-            found_emotes = [f"{e.title}: {e.id}" for e in emotes_list if search_keyword in e.id.lower() or (e.title and search_keyword in e.title.lower())]
+        # 📚 لیست کامل و رسمی تمام دنس‌های استراحت، خوابیدن و نشستن در هایرایز همراه با آیدی سروری
+        all_rest_emotes = {
+            "Rest (استراحت پایه)": "emote-rest",
+            "Sit (نشستن معمولی)": "emote-sit",
+            "Lay (دراز کشیدن)": "emote-lay",
+            "Tired (خسته روی زمین)": "emote-tired",
+            "Sleepy (خواب‌آلود)": "emote-sleepy",
+            "Sleeping (خوابیدن روی شکم)": "emote-sleeping",
+            "Floor Sleep (خوابیدن کف زمین)": "emote-floorsleep",
+            "Dead (ولو شدن/بیهوش)": "emote-dead",
+            "Relax (ریلکس کردن)": "emote-relax",
+            "Meditation (مدیتیشن/چهارزانو)": "emote-meditation"
+        }
 
-            if found_emotes:
-                await self.highrise.chat("📌 نتایج یافت شده:\n" + "\n".join(found_emotes[:5]))
-            else:
-                await self.highrise.chat("❌ دنسی پیدا نشد!")
-        except Exception as e:
-            logger.error(f"خطا در جستجو: {e}")
-            await self.highrise.chat(f"❌ خطا: {e}")
+        # جستجو در لیست بالا
+        found_emotes = []
+        for title, emote_id in all_rest_emotes.items():
+            if search_keyword in title.lower() or search_keyword in emote_id.lower():
+                found_emotes.append(f"{title}: {emote_id}")
+
+        if found_emotes:
+            await self.highrise.chat("📌 دنس‌های استراحت یافت شده:\n" + "\n".join(found_emotes[:5]))
+        else:
+            await self.highrise.chat(f"❌ دنس استراحتی با کلمه '{search_keyword}' در دیتابیس یافت نشد!")
 
     async def cmd_loopchat(self, user: User, parts: list):
         admins_lower = [admin.lower() for admin in self.config.get("admin_usernames", [])]
