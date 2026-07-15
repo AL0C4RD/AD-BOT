@@ -1437,7 +1437,7 @@ class AdvancedBot(BaseBot):
             "!party @username عدد - اجرای رقص اجباری برای کاربر\n"
             "!party all عدد - اجرای رقص برای همه\n"
             "!partys @username - توقف رقص اجباری کاربر\n\n"
-            "📩 برای اطلاعات بیشتر به @ad0ri پیام بدید!"
+            "📩 برای اطلاعات بیشتر به @_ALOCARD_ پیام بدید!"
         )
         for chunk in [help_text[i:i+200] for i in range(0, len(help_text), 200)]:
             await self.highrise.chat(chunk)
@@ -2713,7 +2713,7 @@ async def main():
     from http.server import BaseHTTPRequestHandler, HTTPServer
     
     logger.info("تلاش برای بارگذاری متغیرهای محیطی...")
-    room_id = os.getenv("ROOM_ID", "6899ab2662e78f2e4edf3c92")
+    room_id = os.getenv("ROOM_ID", "695544a2d12630de5398c27f")
     api_token = os.getenv("API_TOKEN", "3d581f955ccd40311764537cb3b7d130db968b4c3aa566685ba56936b17616a6")
     
     if not room_id or not api_token:
